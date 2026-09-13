@@ -47,12 +47,12 @@
   h1 { font-size: 21px; margin-bottom: 4px; color: #04314d; text-shadow: 0 1px 0 rgba(255,255,255,0.4); }
   p.sub { color: #0b4e73; margin-top: 0; margin-bottom: 20px; font-size: 14px; }
   label { display: block; font-size: 13px; font-weight: 700; margin-top: 14px; margin-bottom: 4px; color: #073855; }
-  input, select, textarea {
+  input, select {
     width: 100%; padding: 10px 12px; border: 1px solid rgba(9, 90, 140, 0.35);
     border-radius: 10px; font-size: 14px; background: rgba(255, 255, 255, 0.6); color: #06304a;
   }
-  input::placeholder, textarea::placeholder { color: #4c7f9c; }
-  input:focus, select:focus, textarea:focus {
+  input::placeholder { color: #4c7f9c; }
+  input:focus, select:focus {
     outline: none; border-color: #0b8fd0; box-shadow: 0 0 0 3px rgba(11, 143, 208, 0.25);
     background: rgba(255, 255, 255, 0.85);
   }
@@ -83,25 +83,6 @@
   .lagu-extra-symphonic { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .lagu-extra-symphonic input, .lagu-extra-symphonic select { font-size: 13px; padding: 8px 10px; }
   .lagu-extra-symphonic .lyric-field { grid-column: 1 / -1; }
-
-  .lirik-lagu-field {
-    width: 100%;
-    min-height: 110px;
-    margin-top: 8px;
-    padding: 10px 12px;
-    border: 1px solid rgba(9, 90, 140, 0.35);
-    border-radius: 10px;
-    font-size: 13px;
-    font-family: inherit;
-    line-height: 1.45;
-    resize: vertical;
-    background: rgba(255, 255, 255, 0.6);
-    color: #06304a;
-  }
-  .lirik-lagu-field:focus {
-    min-height: 260px;
-    background: rgba(255, 255, 255, 0.9);
-  }
 
   #tambahLagu {
     margin-top: 10px; background: rgba(255, 214, 92, 0.85); color: #5a3d00; border: none;
@@ -236,7 +217,7 @@
       <input type="text" id="keterangan" placeholder="Catatan tambahan">
     </div>
 
-    <label style="margin-top:18px;">Daftar Lagu, Lirik Lagu, ISRC, Komposer, Songwriter, Lyric &amp; Type</label>
+    <label style="margin-top:18px;">Daftar Lagu, ISRC, Komposer, Songwriter, Lyric &amp; Type</label>
     <p class="hint">Lagu yang sudah ada otomatis muncul di bawah — tinggal isi ISRC kalau sudah approve. Tombol "+ Tambah Lagu" untuk lagu baru di album ini.</p>
     <div id="laguContainer"></div>
     <button type="button" id="tambahLagu">+ Tambah Lagu</button>
@@ -263,7 +244,7 @@
   })();
 
   // GANTI dengan URL Web App hasil Deploy dari Code.gs
-  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzgTCvTV8PLonGUW45rxZuBWUO0ASPiz9W4AM6SPVcuHdadGkM8KbaHnR1NMNwHJMXWog/exec";
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwsv5tb2xPq726oBSeVkwbiS_pMtuMRWoTzuJQAZ83MmHuxMDARs_emqdXgOvbLWnpVbg/exec";
 
   const pilihArtis = document.getElementById("pilihArtis");
   const artisBaruInput = document.getElementById("artisBaruInput");
@@ -424,16 +405,6 @@
     muatBtn.textContent = "Tampilkan Data";
   });
 
-  // ---------- HELPER ESCAPE HTML ----------
-  function escapeHtml(value) {
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
   // ---------- BARIS LAGU ----------
   function buatBarisLagu(item = {}) {
     const wrap = document.createElement("div");
@@ -441,20 +412,14 @@
     wrap.dataset.row = item.row || "";
     wrap.innerHTML = `
       <div class="lagu-row">
-        <input type="text" class="judulLagu" placeholder="Judul Lagu" value="${escapeHtml(item.judulLagu || "")}">
-        <input type="text" class="isrc" placeholder="ISRC (kosongkan kalau belum approve)" value="${escapeHtml(item.isrc || "")}">
+        <input type="text" class="judulLagu" placeholder="Judul Lagu" value="${item.judulLagu || ""}">
+        <input type="text" class="isrc" placeholder="ISRC (kosongkan kalau belum approve)" value="${item.isrc || ""}">
         <button type="button" class="hapusLagu">Hapus</button>
       </div>
-
-      <textarea
-        class="lirik-lagu-field"
-        placeholder="Lirik Lagu lengkap — boleh berisi [Intro], [Verse], [Chorus], [Bridge], [Outro], dll."
-      >${escapeHtml(item.lirikLagu || "")}</textarea>
-
       <div class="lagu-extra-symphonic">
-        <input type="text" class="komposer" placeholder="Komposer" value="${escapeHtml(item.komposer || "")}">
-        <input type="text" class="songwriter" placeholder="Songwriter" value="${escapeHtml(item.songwriter || "")}">
-        <input type="text" class="lyric-field" placeholder="Lyric" value="${escapeHtml(item.lyric || "")}">
+        <input type="text" class="komposer" placeholder="Komposer" value="${item.komposer || ""}">
+        <input type="text" class="songwriter" placeholder="Songwriter" value="${item.songwriter || ""}">
+        <input type="text" class="lyric-field" placeholder="Lyric" value="${item.lyric || ""}">
         <select class="type">
           <option value="">-- Type --</option>
           <option value="Vocal">Vocal</option>
@@ -477,14 +442,13 @@
       .map(wrap => ({
         row: wrap.dataset.row ? parseInt(wrap.dataset.row, 10) : null,
         judulLagu: wrap.querySelector(".judulLagu").value.trim(),
-        lirikLagu: wrap.querySelector(".lirik-lagu-field").value.trim(),
         isrc: wrap.querySelector(".isrc").value.trim(),
         komposer: wrap.querySelector(".komposer").value.trim(),
         songwriter: wrap.querySelector(".songwriter").value.trim(),
         lyric: wrap.querySelector(".lyric-field").value.trim(),
         type: wrap.querySelector(".type").value
       }))
-      .filter(item => item.judulLagu || item.lirikLagu || item.isrc || item.row);
+      .filter(item => item.judulLagu || item.isrc || item.row);
 
     if (!artis || !album) { tampilkanStatus("Artis dan album wajib diisi.", false); return; }
     if (lagu.length === 0) { tampilkanStatus("Isi minimal satu lagu.", false); return; }
